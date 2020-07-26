@@ -1,0 +1,198 @@
+JUnit 5 Basics Notes
+---------------------
+
+Agenda
+-------
+Understand Junit 5 architecture
+Learn how to setup a Junit project
+Write tests and learn the Junit API -- Assertions, Life Cycles, Execution Control etc)
+Learn how to handle scenarios -- Exception handling, conditional execution, Repeated tests etc..
+
+The point of writing automated tests is not so much to verify that the code works now. The point is to verify on an ongoing basis that the code continues to work in the future.
+
+Why use a testing framework ?
+
+Test Runs
+----------
+Preparation
+Provide test inputs
+Run the tests
+Provide expected output
+Verify result
+Do Something to alert developer if test failed
+
+Why Juint 5
+------------
+Junit 4 is > 10 years old
+Not upto date with newer testing patterns
+Not up to date with java language features
+Monolithic architecture
+Bugs and feature requests piled up
+
+
+Junit 5 Architecture
+--------------------
+Jupiter 
+Vintage
+External 3rd party APIs
+
+These interact with the core platform -- Test Engine
+We need 2 dependencies in maven Jupier & Core platform (Junit Jupiter API & Junit Jupiter Engine)
+IDEs use the platform directly to run the tests
+
+Junit Jupiter
+--------------
+New programming model in Junit
+Extension model
+
+@Test
+-----
+Marks a method as a Test
+
+
+JUnit Hack --> Can be used as a Runner
+No failures means success
+
+
+Expectation VS Reality
+-----------------------
+Create an instance of the class under test
+setup inputs
+Execute the code you want to test
+Verify the result is what you expect
+
+
+AssertEquals
+------------
+assertEquals(expected, actual)  -> Asserts that expected and actual are equal
+assertArrayEquals(expectedArray, actualArray) --> Verifies each item in the arrays are equal in the corresponding positions
+assertIterableEquals(expectedArray, actualArray) --> verifies each item in the iterable are equal in the corresponding positions
+
+
+Test Driven Development with Junit --> deliberately fail a test and write logic to pass the test
+
+
+Maven surefire plugin integration
+
+
+Asserting exceptions with assertThrows
+---------------------------------------
+assertThrows --> pass the executable on execution of which it's going to throw exception & expected type
+
+
+Test Lifecycle
+--------------
+It is a process in which test instance is created, managed and destroyed.
+
+Junit gives hooks to execute code at certain points in that lifecycle from creation of class to termination.
+
+There is no order of execution of test methods by default but can be ordered. Not recommended
+
+Junit creates a new class instance for every method run
+
+do not declare member variables as they will be reset during new instance creation
+
+
+Lifecycle hook annotations
+---------------------------
+
+Initialize before anything in this class runs  --> @BeforeAll
+
+Initialize before each method  --> @BeforeEach
+
+Tear down adter each method   --> @AfterEach
+
+Tear down after all methods are done --> @AfterAll
+
+BeforeAll & AfterAll are methods that execute even before the instance is created & after the instance is terminated
+
+declare beforeAll method with static keyword
+
+
+Changing default Test Instance behavior
+-----------------------------------------
+
+New Instance created per Test  --> @TestInstance(TestInstance.Lifecycle.PER_METHOD) --> Default 
+
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) 
+
+static is not needed if instance is created only one per class
+
+
+
+DisplayName & Disabled Annotations
+-----------------------------------
+
+@DisplayName("Testing Add Method")
+
+@Disabled --> for disabling any test method
+
+
+Conditional Execution & Assumptions
+------------------------------------
+@EnabledOnOs(OS.LINUX)
+@EnbledOnJre(JRE.JAVA_11)
+@EnabledIf
+@EnabledIfSystemProperty
+@EnabledIfEnvironmentVariable
+
+
+Handling external factors 
+--------------------------
+assumeTrue(value) --> gives programmatic control for disabling tests
+
+
+AssertAll
+----------
+
+Takes bunch of executables and runs all of them. Test fails if any one of the executable fails.
+
+ assertAll(
+                () -> assertEquals(0, mathUtils.multiply(1, 0)),
+                () -> assertEquals(1, mathUtils.multiply(1, 1)),
+                () -> assertEquals(6, mathUtils.multiply(2, 3))
+        );
+
+
+Nested Test Classes
+-------------------
+
+To organize large test methods in large projects
+
+@Nested --> way of grouping test methods
+
+
+Lazy Assert Messages
+--------------------
+
+Use supplier for assert messages in case of an expensive string computation inside a test. for ex when you want to pass a string to assertEquals only when the test case fails
+
+@Test
+        void testAddingTwoPositives() {
+            assertEquals(2, mathUtils.add(1, 2),
+                    () -> "Add method should return the sum of two numbers");
+        }
+
+
+
+Repeated Tests
+--------------
+
+@Repeated(3) --> Repeat test run for 3 times
+
+we can use RepetitionInfo for subsequent repetition logics
+
+
+Tagging
+--------
+
+Lets you tag the test cases in large projects. For example Unit Tests, Integration Tests
+
+@Tag("Math")
+
+
+TestInfo & TestReporter
+-----------------------
+Junit maintains these instances  of classes interanlly and we can use these if required for our test cases. This is achieved through Dependency Injection.
+
